@@ -8,5 +8,23 @@
 
   "frameworks": {
     "netcoreapp1.0": { }
+  },
+
+  "authors": [
+    "Andrew Pattison"
+  ],
+
+  "projectUrl": "https://github.com/andygjp/ExpressionToSql",
+
+  "packOptions": {
+    "owners": [
+      "andygjp"
+    ],
+    "repository": {
+      "type": "git" ,
+      "url": "https://github.com/andygjp/ExpressionToSql"
+    },
+    "licenseUrl": "http://choosealicense.com/licenses/mit/",
+    "summary": "Convert an Expression into a query string that works with Dapper."
   }
 }
