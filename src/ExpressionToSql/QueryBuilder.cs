@@ -2,6 +2,7 @@ namespace ExpressionToSql
 {
     using System;
     using System.Linq.Expressions;
+    using System.Reflection;
     using System.Text;
 
     internal class QueryBuilder<T, R>
@@ -47,11 +48,23 @@ namespace ExpressionToSql
                 sb.Append(_take.Value);
             }
 
+            const string identifier = "a";
+
             var body = _select.Body;
+            var type = _select.Parameters[0].Type;
             if (body.NodeType == ExpressionType.MemberAccess)
             {
-                sb.Append(" ");
-                AppendMember(sb, (MemberExpression)body);
+                var memberExpression = (MemberExpression)body;
+                if (memberExpression.Member.DeclaringType == type)
+                {
+                    sb.Append(" ");
+                    AppendMember(sb, identifier, memberExpression);
+                }
+                else
+                {
+                    sb.Append(" @");
+                    sb.Append(memberExpression.Member.Name);
+                }
             }
             else if (body.NodeType == ExpressionType.Constant)
             {
@@ -60,10 +73,27 @@ namespace ExpressionToSql
             }
             else if (body.NodeType == ExpressionType.New)
             {
-                foreach (var member in ((NewExpression)body).Members)
+                foreach (Expression argument in ((NewExpression)body).Arguments)
                 {
-                    sb.Append(" ");
-                    sb.Append(member.Name);
+                    if (argument.NodeType == ExpressionType.Constant)
+                    {
+                        sb.Append(" ");
+                        AppendConstant(sb, (ConstantExpression)argument);
+                    }
+                    else
+                    {
+                        var memberExpression = (MemberExpression) argument;
+                        if (memberExpression.Member.DeclaringType == type)
+                        {
+                            sb.Append(" ");
+                            AppendMember(sb, identifier, memberExpression);
+                        }
+                        else
+                        {
+                            sb.Append(" @");
+                            sb.Append(memberExpression.Member.Name);
+                        }
+                    }
                     sb.Append(",");
                 }
                 sb.Length -= 1; // Remove last comma
@@ -79,7 +109,16 @@ namespace ExpressionToSql
                 sb.Append(_table.Schema);
                 sb.Append(".");
             }
-            sb.Append(_table.Name ?? $"[{_select.Parameters[0].Type.Name}]");
+            if (string.IsNullOrWhiteSpace(_table.Name))
+            {
+                AppendEscapedValue(sb, type.Name);
+            }
+            else
+            {
+                sb.Append(_table.Name);
+            }
+            sb.Append(" AS ");
+            sb.Append(identifier);
         }
 
         private void BuildWhere(StringBuilder sb)
@@ -95,6 +134,9 @@ namespace ExpressionToSql
             {
                 case ExpressionType.Equal:
                     BuildTest(sb, binaryExpression, "=");
+                    break;
+                case ExpressionType.NotEqual:
+                    BuildTest(sb, binaryExpression, "<>");
                     break;
                 case ExpressionType.GreaterThan:
                     BuildTest(sb, binaryExpression, ">");
@@ -133,7 +175,7 @@ namespace ExpressionToSql
                 right = binaryExpression.Left;
             }
 
-            AppendMember(sb, (MemberExpression)left);
+            AppendMember(sb, "a", (MemberExpression)left);
             sb.Append(" ");
             sb.Append(operand);
 
@@ -145,7 +187,7 @@ namespace ExpressionToSql
             else if (right.NodeType == ExpressionType.MemberAccess)
             {
                 sb.Append(" @");
-                AppendMember(sb, (MemberExpression)right);
+                sb.Append(((MemberExpression) right).Member.Name);
             }
             else
             {
@@ -153,9 +195,26 @@ namespace ExpressionToSql
             }
         }
 
-        private static void AppendMember(StringBuilder sb, MemberExpression member)
+        private static void AppendMember(StringBuilder sb, string identifier, MemberExpression member)
         {
-            sb.Append(member.Member.Name);
+            AppendMember(sb, identifier, member.Member);
+        }
+
+        private static void AppendMember(StringBuilder sb, string identifier, MemberInfo memberInfo)
+        {
+            if (!string.IsNullOrWhiteSpace(identifier))
+            {
+                sb.Append(identifier);
+                sb.Append(".");
+            }
+            AppendEscapedValue(sb, memberInfo.Name);
+        }
+
+        private static void AppendEscapedValue(StringBuilder sb, string value)
+        {
+            sb.Append("[");
+            sb.Append(value);
+            sb.Append("]");
         }
 
         private static void AppendConstant(StringBuilder sb, ConstantExpression constant)
