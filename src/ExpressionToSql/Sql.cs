@@ -12,6 +12,11 @@
             return Create(selector, null, tableName);
         }
 
+        public static Select<T1, T2, R> Select<T1, T2, R>(Expression<Func<T1, T2, R>> selector, Expression<Func<T1, T2, bool>> on, string tableName = null)
+        {
+            return new Select<T1, T2, R>(selector, on, null, new Table { Name = tableName });
+        }
+
         public static Select<T, R> Top<T, R>(Expression<Func<T, R>> selector, int take, string tableName = null)
         {
             return Create(selector, take, tableName);
