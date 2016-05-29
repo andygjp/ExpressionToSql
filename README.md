@@ -9,7 +9,7 @@ You can write a strongly typed query and have it converted to a query that [Dapp
 Or:
 
     var query = Sql.Select((Address x) => 1, "TableName").Where(x => x.Id == 1001).ToString();
-    // "SELECT 1 FROM [dbo].[Address] AS a WHERE a.[Id] = 1001
+    // "SELECT 1 FROM [dbo].TableName AS a WHERE a.[Id] = 1001
 
 ## TODO
 - Add support for joins
