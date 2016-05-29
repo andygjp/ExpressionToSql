@@ -83,5 +83,26 @@
             var actual = Sql.Select((Address x) => a).ToString();
             actual.Should().Be("SELECT 1 FROM [dbo].[Address] AS a");
         }
+
+        [Fact]
+        public void Simple_select_with_specific_table_name_should_produce_select()
+        {
+            var actual = Sql.Select((Address x) => x.Address1, "MyTable").ToString();
+            actual.Should().Be("SELECT a.[Address1] FROM [dbo].MyTable AS a");
+        }
+
+        [Fact]
+        public void Simple_select_with_specific_table_name_and_schema_should_produce_select()
+        {
+            var actual = Sql.Select((Address x) => x.Address1, new Table {Name = "MyTable", Schema = "MySchema"}).ToString();
+            actual.Should().Be("SELECT a.[Address1] FROM MySchema.MyTable AS a");
+        }
+
+        [Fact]
+        public void Simple_select_with_specific_schema_should_produce_select()
+        {
+            var actual = Sql.Select((Address x) => x.Address1, new Table { Schema = "MySchema" }).ToString();
+            actual.Should().Be("SELECT a.[Address1] FROM MySchema.[Address] AS a");
+        }
     }
 }
