@@ -1,6 +1,5 @@
 ﻿namespace ExpressionToSql.UnitTests
 {
-    using System.IO.Compression;
     using ExpressionToSql;
     using FluentAssertions;
     using Xunit;
@@ -103,6 +102,13 @@
         {
             var actual = Sql.Select((Address x) => x.Address1, new Table { Schema = "MySchema" }).ToString();
             actual.Should().Be("SELECT a.[Address1] FROM MySchema.[Address] AS a");
+        }
+
+        [Fact(Skip = "TODO")]
+        public void Inner_join_2()
+        {
+            var actual = Sql.Select((Address x, Customer y) => new { x.Address1, y.Name }, (x, y) => x.Id == y.AddressId).ToString();
+            actual.Should().Be("SELECT a.[Address1], b.[Name] FROM dbo.[Address] AS a INNER JOIN dbo.[Customer] AS b ON a.[Id] = b.[AddressId]");
         }
     }
 }
