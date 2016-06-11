@@ -35,19 +35,17 @@ namespace ExpressionToSql
 
             var type = _select.Parameters[0].Type;
 
-            var expressions = GetExpressions(type);
+            var expressions = GetExpressions(type, _select.Body);
 
-            AddExpressions(expressions, qb, type);
+            AddExpressions(expressions, type, qb);
 
             qb.AddTable(_table);
 
             return sb;
         }
 
-        private IEnumerable<Expression> GetExpressions(Type type)
+        private static IEnumerable<Expression> GetExpressions(Type type, Expression body)
         {
-            var body = _select.Body;
-
             if (body.NodeType == ExpressionType.New)
             {
                 var n = (NewExpression) body;
@@ -62,31 +60,36 @@ namespace ExpressionToSql
             return new[] {body};
         }
 
-        private static void AddExpressions(IEnumerable<Expression> expressions, QueryBuilder qb, Type type)
+        private static void AddExpressions(IEnumerable<Expression> es, Type t, QueryBuilder qb)
         {
-            foreach (var argument in expressions)
+            foreach (var e in es)
             {
-                switch (argument.NodeType)
-                {
-                    case ExpressionType.Constant:
-                        var c = (ConstantExpression) argument;
-                        qb.AddValue(c.Value);
-                        break;
-                    case ExpressionType.MemberAccess:
-                        var m = (MemberExpression) argument;
-                        AddExpression(m, type, qb);
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
+                AddExpression(e, t, qb);
                 qb.AddSeparator();
             }
             qb.Remove(); // Remove last comma
         }
 
-        private static void AddExpression(MemberExpression m, Type type, QueryBuilder qb)
+        private static void AddExpression(Expression e, Type t, QueryBuilder qb)
         {
-            if (m.Member.DeclaringType == type)
+            switch (e.NodeType)
+            {
+                case ExpressionType.Constant:
+                    var c = (ConstantExpression) e;
+                    qb.AddValue(c.Value);
+                    break;
+                case ExpressionType.MemberAccess:
+                    var m = (MemberExpression) e;
+                    AddExpression(m, t, qb);
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        private static void AddExpression(MemberExpression m, Type t, QueryBuilder qb)
+        {
+            if (m.Member.DeclaringType == t)
             {
                 qb.AddAttribute(m.Member.Name);
             }
