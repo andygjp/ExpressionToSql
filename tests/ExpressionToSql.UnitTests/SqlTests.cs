@@ -51,6 +51,22 @@
         }
 
         [Fact]
+        public void Simple_ands_where_should_produce_select()
+        {
+            const int id = 10;
+            var actual = Sql.Select((Address x) => x.Id).Where(x => x.Id > id && x.Id < 1000 && x.Address1 != "''").ToString();
+            actual.Should().Be("SELECT a.[Id] FROM [dbo].[Address] AS a WHERE a.[Id] > 10 AND a.[Id] < 1000 AND a.[Address1] <> ''");
+        }
+
+        [Fact]
+        public void Simple_ored_where_should_produce_select()
+        {
+            const int id = 10;
+            var actual = Sql.Select((Address x) => new { x.Id, x.Postcode }).Where(x => x.Id > id || x.Postcode == "'M20'").ToString();
+            actual.Should().Be("SELECT a.[Id], a.[Postcode] FROM [dbo].[Address] AS a WHERE a.[Id] > 10 OR a.[Postcode] = 'M20'");
+        }
+
+        [Fact]
         public void Queries_with_parameters_should_produce_select()
         {
             const int a = 1;
@@ -87,21 +103,21 @@
         public void Simple_select_with_specific_table_name_should_produce_select()
         {
             var actual = Sql.Select((Address x) => x.Address1, "MyTable").ToString();
-            actual.Should().Be("SELECT a.[Address1] FROM [dbo].MyTable AS a");
+            actual.Should().Be("SELECT a.[Address1] FROM [dbo].[MyTable] AS a");
         }
 
         [Fact]
         public void Simple_select_with_specific_table_name_and_schema_should_produce_select()
         {
-            var actual = Sql.Select((Address x) => x.Address1, new Table {Name = "MyTable", Schema = "MySchema"}).ToString();
-            actual.Should().Be("SELECT a.[Address1] FROM MySchema.MyTable AS a");
+            var actual = Sql.Select(x => x.Address1, new Table<Address> {Name = "MyTable", Schema = "MySchema"}).ToString();
+            actual.Should().Be("SELECT a.[Address1] FROM [MySchema].[MyTable] AS a");
         }
 
         [Fact]
         public void Simple_select_with_specific_schema_should_produce_select()
         {
-            var actual = Sql.Select((Address x) => x.Address1, new Table { Schema = "MySchema" }).ToString();
-            actual.Should().Be("SELECT a.[Address1] FROM MySchema.[Address] AS a");
+            var actual = Sql.Select(x => x.Address1, new Table<Address> { Schema = "MySchema" }).ToString();
+            actual.Should().Be("SELECT a.[Address1] FROM [MySchema].[Address] AS a");
         }
 
         [Fact(Skip = "TODO")]

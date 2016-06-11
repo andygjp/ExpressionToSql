@@ -14,7 +14,8 @@
 
         public static Select<T1, T2, R> Select<T1, T2, R>(Expression<Func<T1, T2, R>> selector, Expression<Func<T1, T2, bool>> on, string tableName = null)
         {
-            return new Select<T1, T2, R>(selector, on, null, new Table { Name = tableName });
+            throw new NotImplementedException("TODO");
+            return new Select<T1, T2, R>(selector, on, null, new Table<T1> { Name = tableName });
         }
 
         public static Select<T, R> Top<T, R>(Expression<Func<T, R>> selector, int take, string tableName = null)
@@ -24,22 +25,22 @@
 
         private static Select<T, R> Create<T, R>(Expression<Func<T, R>> selector, int? take, string tableName)
         {
-            return new Select<T, R>(selector, take, new Table {Name = tableName});
+            return new Select<T, R>(selector, take, new Table<T> {Name = tableName});
         }
 
-        public static Select<T, R> Select<T, R>(Expression<Func<T, R>> selector, Table table)
+        public static Select<T, R> Select<T, R>(Expression<Func<T, R>> selector, Table<T> table)
         {
             return Create(selector, null, table);
         }
 
-        public static Select<T, R> Top<T, R>(Expression<Func<T, R>> selector, int take, Table table)
+        public static Select<T, R> Top<T, R>(Expression<Func<T, R>> selector, int take, Table<T> table)
         {
             return Create(selector, take, table);
         }
 
-        private static Select<T, R> Create<T, R>(Expression<Func<T, R>> selector, int? take, Table table)
+        private static Select<T, R> Create<T, R>(Expression<Func<T, R>> selector, int? take, Table<T> table)
         {
-            return new Select<T, R>(selector, take, table ?? new Table());
+            return new Select<T, R>(selector, take, table ?? new Table<T>());
         }
     }
 }

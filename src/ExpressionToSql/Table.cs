@@ -1,8 +1,15 @@
 namespace ExpressionToSql
 {
-    public class Table
+    public class Table<T>
     {
-        public string Name { get; set; }
+        private string _name;
+
+        public string Name
+        {
+            get { return _name ?? typeof(T).Name; }
+            set { _name = value; }
+        }
+
         public string Schema { get; set; } = "[dbo]";
     }
 }
