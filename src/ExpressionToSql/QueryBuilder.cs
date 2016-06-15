@@ -83,49 +83,49 @@ namespace ExpressionToSql
             return this;
         }
 
-        public QueryBuilder AddCondition(Operand operand, string attributeName, string parameterName, string aliasName = AliasName)
+        public QueryBuilder AddCondition(string op, string attributeName, string parameterName, string aliasName = AliasName)
         {
-            AppendAndCondition(operand, attributeName, aliasName);
+            AppendAndCondition(op, attributeName, aliasName);
             AddParameter(parameterName);
             return this;
         }
 
-        public QueryBuilder AddCondition(Operand operand, string attributeName, object value, string aliasName = AliasName)
+        public QueryBuilder AddCondition(string op, string attributeName, object value, string aliasName = AliasName)
         {
-            AppendAndCondition(operand, attributeName, aliasName);
+            AppendAndCondition(op, attributeName, aliasName);
             AddValue(value);
             return this;
         }
 
-        public QueryBuilder OrCondition(Operand operand, string attributeName, string parameterName, string aliasName = AliasName)
+        public QueryBuilder OrCondition(string op, string attributeName, string parameterName, string aliasName = AliasName)
         {
-            AppendOrCondition(operand, attributeName, aliasName);
+            AppendOrCondition(op, attributeName, aliasName);
             AddParameter(parameterName);
             return this;
         }
 
-        public QueryBuilder OrCondition(Operand operand, string attributeName, object value, string aliasName = AliasName)
+        public QueryBuilder OrCondition(string op, string attributeName, object value, string aliasName = AliasName)
         {
-            AppendOrCondition(operand, attributeName, aliasName);
+            AppendOrCondition(op, attributeName, aliasName);
             AddValue(value);
             return this;
         }
 
-        private void AppendAndCondition(Operand operand, string attributeName, string aliasName)
+        private void AppendAndCondition(string op, string attributeName, string aliasName)
         {
-            AppendCondition(operand, attributeName, aliasName, "AND");
+            AppendCondition(op, attributeName, aliasName, "AND");
         }
 
-        private void AppendOrCondition(Operand operand, string attributeName, string aliasName)
+        private void AppendOrCondition(string op, string attributeName, string aliasName)
         {
-            AppendCondition(operand, attributeName, aliasName, "OR");
+            AppendCondition(op, attributeName, aliasName, "OR");
         }
 
-        private void AppendCondition(Operand operand, string attributeName, string aliasName, string condition)
+        private void AppendCondition(string op, string attributeName, string aliasName, string condition)
         {
             AppendCondition(condition);
             AddAttribute(attributeName, aliasName);
-            _sb.Append(" ").Append(operand.ToSqlOperand());
+            _sb.Append(" ").Append(op);
         }
 
         private void AppendCondition(string condition)

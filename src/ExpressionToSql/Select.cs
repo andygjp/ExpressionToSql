@@ -46,18 +46,17 @@ namespace ExpressionToSql
 
         private static IEnumerable<Expression> GetExpressions(Type type, Expression body)
         {
-            if (body.NodeType == ExpressionType.New)
+            switch (body.NodeType)
             {
-                var n = (NewExpression) body;
-                return n.Arguments;
+                case ExpressionType.New:
+                    var n = (NewExpression) body;
+                    return n.Arguments;
+                case ExpressionType.Parameter:
+                    var propertyInfos = new SimpleTypeBinder().GetProperties(type);
+                    return propertyInfos.Values.Select(pi => Expression.Property(body, pi));
+                default:
+                    return new[] { body };
             }
-            if (body.NodeType == ExpressionType.Parameter)
-            {
-                var propertyInfos = new SimpleTypeBinder().GetProperties(type);
-                return propertyInfos.Values.Select(pi => Expression.Property(body, pi));
-            }
-
-            return new[] {body};
         }
 
         private static void AddExpressions(IEnumerable<Expression> es, Type t, QueryBuilder qb)

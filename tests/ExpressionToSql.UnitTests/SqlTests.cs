@@ -59,6 +59,14 @@
         }
 
         [Fact]
+        public void Many_ands_where_should_produce_select()
+        {
+            const int id = 10;
+            var actual = Sql.Select((Address x) => x.Id).Where(x => x.Id > id && x.Id < 1000 && x.Address1 != "''" && x.Postcode != "''").ToString();
+            actual.Should().Be("SELECT a.[Id] FROM [dbo].[Address] AS a WHERE a.[Id] > 10 AND a.[Id] < 1000 AND a.[Address1] <> '' AND a.[Postcode] <> ''");
+        }
+
+        [Fact]
         public void Simple_ored_where_should_produce_select()
         {
             const int id = 10;
