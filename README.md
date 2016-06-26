@@ -1,5 +1,8 @@
 # ExpressionToSql
 
+[![NuGet version](https://badge.fury.io/nu/expressiontosql.svg)](https://badge.fury.io/nu/expressiontosql)
+[![](https://ci.appveyor.com/api/projects/status/github/andygjp/ExpressionToSql?branch=master&svg=true)](https://ci.appveyor.com/project/andygjp/expressiontosql)
+
 You can write a strongly typed query and have it converted to a query that [Dapper](https://github.com/StackExchange/dapper-dot-net) understands. Like so:
 
     var postcode = "BL";
