@@ -117,7 +117,7 @@
         [Fact]
         public void Simple_select_with_specific_table_name_and_schema_should_produce_select()
         {
-            var actual = Sql.Select(x => x.Address1, new Table<Address> {Name = "MyTable", Schema = "MySchema"}).ToString();
+            var actual = Sql.Select((Address x) => x.Address1, new Table {Name = "MyTable", Schema = "MySchema"}).ToString();
             actual.Should().Be("SELECT a.[Address1] FROM [MySchema].[MyTable] AS a");
         }
 
@@ -128,11 +128,18 @@
             actual.Should().Be("SELECT a.[Address1] FROM [MySchema].[Address] AS a");
         }
 
+        [Fact]
+        public void Simple_select_with_hierarchial_table_should_produce_select()
+        {
+            var actual = Sql.Select((DeliveryAddress x) => x.DeliveryName, Table<Address>.WithDefaultSchema()).ToString();
+            actual.Should().Be("SELECT a.[DeliveryName] FROM [dbo].[Address] AS a");
+        }
+
         [Fact(Skip = "TODO")]
         public void Inner_join_2()
         {
             var actual = Sql.Select((Address x, Customer y) => new { x.Address1, y.Name }, (x, y) => x.Id == y.AddressId).ToString();
-            actual.Should().Be("SELECT a.[Address1], b.[Name] FROM dbo.[Address] AS a INNER JOIN dbo.[Customer] AS b ON a.[Id] = b.[AddressId]");
+            actual.Should().Be("SELECT a.[Address1], b.[Name] FROM [dbo].[Address] AS a INNER JOIN dbo.[Customer] AS b ON a.[Id] = b.[AddressId]");
         }
     }
 }

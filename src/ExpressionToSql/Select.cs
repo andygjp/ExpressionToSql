@@ -9,9 +9,9 @@ namespace ExpressionToSql
     {
         private readonly Expression<Func<T, R>> _select;
         private readonly int? _take;
-        private readonly Table<T> _table;
+        private readonly Table _table;
 
-        internal Select(Expression<Func<T, R>> select, int? take, Table<T> table)
+        internal Select(Expression<Func<T, R>> select, int? take, Table table)
         {
             _select = select;
             _take = take;
@@ -98,7 +98,7 @@ namespace ExpressionToSql
 
     public class Select<T1, T2, R>
     {
-        internal Select(Expression<Func<T1, T2, R>> select, Expression<Func<T1, T2, bool>> on, int? take, Table<T1> table)
+        internal Select(Expression<Func<T1, T2, R>> select, Expression<Func<T1, T2, bool>> on, int? take, Table table)
         {
         }
 

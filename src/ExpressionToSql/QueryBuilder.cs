@@ -65,7 +65,7 @@ namespace ExpressionToSql
             return this;
         }
 
-        public QueryBuilder AddTable<T>(Table<T> table, string aliasName = AliasName)
+        public QueryBuilder AddTable(Table table, string aliasName = AliasName)
         {
             _sb.Append(" FROM ");
 
