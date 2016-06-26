@@ -6,6 +6,8 @@
   "dependencies": {
     "xunit": "2.1.0",
     "dotnet-test-xunit": "1.0.0-rc2-build10025",
+    "Dapper": "1.50.0-rc2a",
+    "Dapper.Contrib": "1.50.0-rc2a",
     "ExpressionToSql.Dapper": "1.0.0-*",
     "FluentAssertions": "4.6.3",
     "System.Data.SqlLocalDb": "1.15.0"

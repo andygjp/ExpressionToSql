@@ -3,7 +3,6 @@
 
   "dependencies": {
     "Dapper": "1.50.0-rc2a",
-    "Dapper.Contrib": "1.50.0-rc2a",
     "ExpressionToSql": {
       "version": "1.0.1-*",
       "target": "project"
