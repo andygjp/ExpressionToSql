@@ -7,6 +7,7 @@
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using FluentAssertions;
+    using global::Dapper;
     using global::Dapper.Contrib.Extensions;
     using Xunit;
 
@@ -22,8 +23,8 @@
         [Fact]
         public async Task It_should_return_all_person()
         {
-            IEnumerable<string> ids = await _conn.QueryAsync(Sql.Select((Person x) => x.Name));
-            ids.Should().HaveCount(2);
+            IEnumerable<string> names = await _conn.QueryAsync(Sql.Select((Person x) => x.Name));
+            names.Should().HaveCount(2);
         }
     }
 
@@ -39,8 +40,52 @@
         [Fact]
         public async Task It_should_return_every_member()
         {
-            IEnumerable<Person> person = await _conn.QueryAsync(Sql.Select((Person x) => x).Where(x => x.Id == 2));
-            person.Single().ShouldBeEquivalentTo(new Person {Id = 2, Name = "John Johnson"});
+            var o = new {id = 2};
+
+            var persons = await _conn.QueryAsync(Sql.Select((Person x) => x).Where(x => x.Id == o.id), o);
+            persons.Single().ShouldBeEquivalentTo(new Person {Id = 2, Name = "John Johnson"});
+        }
+    }
+
+    public class When_checking_entity_exists : IClassFixture<Fixture>
+    {
+        private readonly SqlConnection _conn;
+
+        public When_checking_entity_exists(Fixture fixture)
+        {
+            _conn = fixture.GetConnection();
+        }
+
+        [Fact]
+        public async Task It_should_return_every_member()
+        {
+            var o = new { id = 2 };
+
+            var @where = Sql.Select((Person x) => 1).Where(x => x.Id == o.id).ToString();
+
+            var exists = await _conn.QuerySingleOrDefaultAsync<bool>(@where, o);
+
+            exists.Should().BeTrue();
+        }
+    }
+
+    public class When_checking_for_entity_that_does_not_exist : IClassFixture<Fixture>
+    {
+        private readonly SqlConnection _conn;
+
+        public When_checking_for_entity_that_does_not_exist(Fixture fixture)
+        {
+            _conn = fixture.GetConnection();
+        }
+
+        [Fact]
+        public async Task It_should_return_every_member()
+        {
+            var @where = Sql.Select((Person x) => 1).Where(x => x.Id == -1).ToString();
+
+            var exists = await _conn.QuerySingleOrDefaultAsync<bool>(@where);
+
+            exists.Should().BeFalse();
         }
     }
 
