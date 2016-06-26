@@ -124,7 +124,7 @@
         [Fact]
         public void Simple_select_with_specific_schema_should_produce_select()
         {
-            var actual = Sql.Select(x => x.Address1, new Table<Address> { Schema = "MySchema" }).ToString();
+            var actual = Sql.Select(x => x.Address1, Table<Address>.WithSchema("MySchema")).ToString();
             actual.Should().Be("SELECT a.[Address1] FROM [MySchema].[Address] AS a");
         }
 

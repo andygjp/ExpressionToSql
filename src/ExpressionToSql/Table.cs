@@ -11,5 +11,10 @@ namespace ExpressionToSql
         }
 
         public string Schema { get; set; } = "[dbo]";
+
+        public static Table<T> WithSchema(string name)
+        {
+            return new Table<T> { Schema = name };
+        }
     }
 }
