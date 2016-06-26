@@ -9,6 +9,12 @@ namespace ExpressionToSql
             return ToSql(new StringBuilder()).ToString();
         }
 
-        public abstract StringBuilder ToSql(StringBuilder sb);
+        public StringBuilder ToSql(StringBuilder sb)
+        {
+            ToSql(new QueryBuilder(sb));
+            return sb;
+        }
+
+        internal abstract QueryBuilder ToSql(QueryBuilder qb);
     }
 }

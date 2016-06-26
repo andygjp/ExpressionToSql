@@ -1,9 +1,7 @@
 namespace ExpressionToSql
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq.Expressions;
-    using System.Text;
 
     public class Where<T, R> : Query
     {
@@ -16,22 +14,12 @@ namespace ExpressionToSql
             _where = where;
         }
 
-        public override StringBuilder ToSql(StringBuilder sb)
+        internal override QueryBuilder ToSql(QueryBuilder qb)
         {
-            _select.ToSql(sb);
+            _select.ToSql(qb);
 
-            BuildWhere(new QueryBuilder(sb), (BinaryExpression)_where.Body, And);
-            return sb;
-        }
-
-        private static Clause And(QueryBuilder qb, BinaryExpression binaryExpression, string op)
-        {
-            return new AndClause(qb, binaryExpression, op);
-        }
-
-        private static Clause Or(QueryBuilder qb, BinaryExpression binaryExpression, string op)
-        {
-            return new OrClause(qb, binaryExpression, op);
+            BuildWhere(qb, (BinaryExpression)_where.Body, Clause.And);
+            return qb;
         }
 
         private static void BuildWhere(QueryBuilder qb, BinaryExpression binaryExpression, Func<QueryBuilder, BinaryExpression, string, Clause> clause)
@@ -58,88 +46,70 @@ namespace ExpressionToSql
                     break;
                 case ExpressionType.AndAlso:
                     BuildWhere(qb, (BinaryExpression)binaryExpression.Left, clause);
-                    BuildWhere(qb, (BinaryExpression)binaryExpression.Right, And);
+                    BuildWhere(qb, (BinaryExpression)binaryExpression.Right, Clause.And);
                     break;
                 case ExpressionType.OrElse:
                     BuildWhere(qb, (BinaryExpression)binaryExpression.Left, clause);
-                    BuildWhere(qb, (BinaryExpression)binaryExpression.Right, Or);
+                    BuildWhere(qb, (BinaryExpression)binaryExpression.Right, Clause.Or);
                     break;
                 default:
                     throw new NotImplementedException();
             }
         }
 
-        private abstract class Clause
+        private class Clause
         {
             private readonly BinaryExpression _binaryExpression;
             private readonly string _op;
+            private readonly Func<string, string, object, string, QueryBuilder> _appendValue;
+            private readonly Func<string, string, string, string, QueryBuilder> _apendParameter;
 
-            protected Clause(QueryBuilder qb, BinaryExpression binaryExpression, string op)
+            private Clause(BinaryExpression binaryExpression, string op,
+                Func<string, string, object, string, QueryBuilder> appendValue,
+                Func<string, string, string, string, QueryBuilder> apendParameter)
             {
-                QueryBuilder = qb;
                 _binaryExpression = binaryExpression;
                 _op = op;
+                _appendValue = appendValue;
+                _apendParameter = apendParameter;
             }
 
-            protected QueryBuilder QueryBuilder { get; }
+            public static Clause And(QueryBuilder qb, BinaryExpression binaryExpression, string op)
+            {
+                return new Clause(binaryExpression, op, qb.AddCondition, qb.AddCondition);
+            }
+
+            public static Clause Or(QueryBuilder qb, BinaryExpression binaryExpression, string op)
+            {
+                return new Clause(binaryExpression, op, qb.OrCondition, qb.OrCondition);
+            }
 
             public void Append()
             {
-                var b = Arrange(_binaryExpression);
+                var left = _binaryExpression.Left;
+                var right = _binaryExpression.Right;
+                if (left.NodeType == ExpressionType.Constant && right.NodeType == ExpressionType.MemberAccess)
+                {
+                    left = right;
+                    right = left;
+                }
 
-                var m1 = (MemberExpression) b.Item1;
+                var attributeName = ((MemberExpression) left).Member.Name;
 
-                switch (b.Item2.NodeType)
+                switch (right.NodeType)
                 {
                     case ExpressionType.Constant:
-                        var c = (ConstantExpression)b.Item2;
-                        AddValue()(_op, m1.Member.Name, c.Value, "a");
+                        var c = (ConstantExpression)right;
+                        _appendValue(_op, attributeName, c.Value, QueryBuilder.AliasName);
                         break;
                     case ExpressionType.MemberAccess:
-                        var m2 = (MemberExpression)b.Item2;
-                        AddParameter()(_op, m1.Member.Name, m2.Member.Name, "a");
+                        var m2 = (MemberExpression)right;
+                        _apendParameter(_op, attributeName, m2.Member.Name, QueryBuilder.AliasName);
                         break;
                     default:
                         throw new NotImplementedException();
                 }
             }
-
-            protected abstract Func<string, string, object, string, QueryBuilder> AddValue();
-
-            protected abstract Func<string, string, string, string, QueryBuilder> AddParameter();
-
-            private static Tuple<Expression, Expression> Arrange(BinaryExpression binaryExpression)
-            {
-                var left = binaryExpression.Left;
-                var right = binaryExpression.Right;
-                if (left.NodeType == ExpressionType.Constant && right.NodeType == ExpressionType.MemberAccess)
-                {
-                    return Tuple.Create(right, left);
-                }
-                return Tuple.Create(left, right);
-            }
-        }
-
-        private class AndClause : Clause
-        {
-            public AndClause(QueryBuilder qb, BinaryExpression binaryExpression, string op) : base(qb, binaryExpression, op)
-            {
-            }
-
-            protected override Func<string, string, object, string, QueryBuilder> AddValue() => QueryBuilder.AddCondition;
-
-            protected override Func<string, string, string, string, QueryBuilder> AddParameter() => QueryBuilder.AddCondition;
-        }
-
-        private class OrClause : Clause
-        {
-            public OrClause(QueryBuilder qb, BinaryExpression binaryExpression, string op) : base(qb, binaryExpression, op)
-            {
-            }
-
-            protected override Func<string, string, object, string, QueryBuilder> AddValue() => QueryBuilder.OrCondition;
-
-            protected override Func<string, string, string, string, QueryBuilder> AddParameter() => QueryBuilder.OrCondition;
         }
     }
 }

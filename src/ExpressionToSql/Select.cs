@@ -4,7 +4,6 @@ namespace ExpressionToSql
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Text;
 
     public class Select<T, R> : Query
     {
@@ -24,10 +23,8 @@ namespace ExpressionToSql
             return new Where<T, R>(this, predicate);
         }
 
-        public override StringBuilder ToSql(StringBuilder sb)
+        internal override QueryBuilder ToSql(QueryBuilder qb)
         {
-            var qb = new QueryBuilder(sb);
-
             if (_take.HasValue)
             {
                 qb.Take(_take.Value);
@@ -41,7 +38,7 @@ namespace ExpressionToSql
 
             qb.AddTable(_table);
 
-            return sb;
+            return qb;
         }
 
         private static IEnumerable<Expression> GetExpressions(Type type, Expression body)

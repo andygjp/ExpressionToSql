@@ -6,11 +6,7 @@ namespace ExpressionToSql
     {
         private readonly StringBuilder _sb;
         private bool _firstCondition = true;
-        private const string AliasName = "a";
-
-        public QueryBuilder() : this(new StringBuilder())
-        {
-        }
+        public const string AliasName = "a";
 
         public QueryBuilder(StringBuilder sb)
         {
@@ -19,6 +15,11 @@ namespace ExpressionToSql
                 sb.Append("SELECT");
             }
             _sb = sb;
+        }
+
+        public override string ToString()
+        {
+            return _sb.ToString();
         }
 
         public QueryBuilder Take(int count)
