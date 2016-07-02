@@ -1,10 +1,10 @@
 ﻿{
-  "version": "2.0.0-*",
+  "version": "2.0.1-*",
 
   "dependencies": {
-    "Dapper": "1.50.0-rc2a",
+    "Dapper": "1.50.0-rc3",
     "ExpressionToSql": {
-      "version": "1.0.3",
+      "version": "1.0.5",
       "target": "project"
     }
   },
@@ -13,12 +13,12 @@
     "net45": { },
     "netstandard1.3": {
       "dependencies": {
-        "System.Runtime.InteropServices": "4.1.0-rc2-24027"
+        "System.Runtime.InteropServices": "4.1.0"
       }
     },
     "netcoreapp1.0": {
       "dependencies": {
-        "System.Runtime.InteropServices": "4.1.0-rc2-24027"
+        "System.Runtime.InteropServices": "4.1.0"
       }
     }
   },
