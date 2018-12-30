@@ -62,16 +62,16 @@ namespace ExpressionToSql
             private readonly BinaryExpression _binaryExpression;
             private readonly string _op;
             private readonly Func<string, string, object, string, QueryBuilder> _appendValue;
-            private readonly Func<string, string, string, string, QueryBuilder> _apendParameter;
+            private readonly Func<string, string, string, string, QueryBuilder> _appendParameter;
 
             private Clause(BinaryExpression binaryExpression, string op,
                 Func<string, string, object, string, QueryBuilder> appendValue,
-                Func<string, string, string, string, QueryBuilder> apendParameter)
+                Func<string, string, string, string, QueryBuilder> appendParameter)
             {
                 _binaryExpression = binaryExpression;
                 _op = op;
                 _appendValue = appendValue;
-                _apendParameter = apendParameter;
+                _appendParameter = appendParameter;
             }
 
             public static Clause And(QueryBuilder qb, BinaryExpression binaryExpression, string op)
@@ -104,7 +104,7 @@ namespace ExpressionToSql
                         break;
                     case ExpressionType.MemberAccess:
                         var m2 = (MemberExpression)right;
-                        _apendParameter(_op, attributeName, m2.Member.Name, QueryBuilder.AliasName);
+                        _appendParameter(_op, attributeName, m2.Member.Name, QueryBuilder.AliasName);
                         break;
                     default:
                         throw new NotImplementedException();
