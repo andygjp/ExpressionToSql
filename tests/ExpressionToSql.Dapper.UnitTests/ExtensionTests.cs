@@ -43,7 +43,7 @@
             var o = new {id = 2};
 
             var persons = await _conn.QueryAsync(Sql.Select((Person x) => x).Where(x => x.Id == o.id), o);
-            persons.Single().ShouldBeEquivalentTo(new Person {Id = 2, Name = "John Johnson"});
+            persons.Single().Should().BeEquivalentTo(new Person {Id = 2, Name = "John Johnson"});
         }
     }
 

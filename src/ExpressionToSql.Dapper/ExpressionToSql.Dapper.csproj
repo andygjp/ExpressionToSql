@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExpressionToSql\ExpressionToSql.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="1.50.5" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+    <PropertyGroup>
+    <Authors>Andrew Pattison</Authors>
+    <PackageDescription>Adds extension to Dapper that allows you to build a query in a strongly typed manner.</PackageDescription>
+    <PackageProjectUrl>https://github.com/andygjp/ExpressionToSql</PackageProjectUrl>
+    <PackageLicenseUrl>http://choosealicense.com/licenses/mit/</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/andygjp/ExpressionToSql</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>Andrew Pattison</Authors>
+    <PackageDescription>Convert an Expression into a query string that works with Dapper.</PackageDescription>
+    <PackageProjectUrl>https://github.com/andygjp/ExpressionToSql</PackageProjectUrl>
+    <PackageLicenseUrl>http://choosealicense.com/licenses/mit/</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/andygjp/ExpressionToSql</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+</Project>
