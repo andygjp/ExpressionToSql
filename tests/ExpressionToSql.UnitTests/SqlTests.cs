@@ -9,6 +9,13 @@
         [Fact]
         public void Simple_select_with_no_attributes_should_produce_select()
         {
+            var actual = Sql.Select((Address x) => x).ToSql();
+            actual.Should().Be("SELECT a.[Id], a.[Address1], a.[City], a.[Postcode] FROM [dbo].[Address] AS a");
+        }
+        
+        [Fact]
+        public void Simple_select_with_literal_and_no_attributes_should_produce_select()
+        {
             var actual = Sql.Select((Address x) => 1).ToString();
             actual.Should().Be("SELECT 1 FROM [dbo].[Address] AS a");
         }

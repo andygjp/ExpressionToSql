@@ -6,6 +6,11 @@ namespace ExpressionToSql
     {
         public override string ToString()
         {
+            return ToSql();
+        }
+        
+        public string ToSql()
+        {
             return ToSql(new StringBuilder()).ToString();
         }
 
