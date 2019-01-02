@@ -2,8 +2,8 @@ namespace ExpressionToSql.Dapper.UnitTests
 {
     using System;
     using System.Data.SqlClient;
-    using System.Data.SqlLocalDb;
     using System.IO;
+    using MartinCostello.SqlLocalDb;
 
     public class TestDatabase : IDisposable
     {
@@ -23,7 +23,12 @@ namespace ExpressionToSql.Dapper.UnitTests
 
         public static TestDatabase Create(string pathToSeedDb)
         {
-            return new TestDatabase(TemporarySqlLocalDbInstance.Create(true), pathToSeedDb);
+            var sqlLocalDbApi = new SqlLocalDbApi
+            {
+                StopOptions = StopInstanceOptions.KillProcess
+            };
+            var temporarySqlLocalDbInstance = sqlLocalDbApi.CreateTemporaryInstance(deleteFiles: true);
+            return new TestDatabase(temporarySqlLocalDbInstance, pathToSeedDb);
         }
 
         public SqlConnection GetSqlConnection()
@@ -31,9 +36,9 @@ namespace ExpressionToSql.Dapper.UnitTests
             return new SqlConnection(_connectionString);
         }
 
-        private static string GetConnectionString(ISqlLocalDbInstance instance, string pathToModel)
+        private string GetConnectionString(ISqlLocalDbApiAdapter instance, string pathToModel)
         {
-            var sqlConnectionStringBuilder = instance.CreateConnectionStringBuilder();
+            var sqlConnectionStringBuilder = new SqlConnectionStringBuilder(_instance.ConnectionString);
             sqlConnectionStringBuilder.InitialCatalog = Path.GetFileNameWithoutExtension(pathToModel);
             sqlConnectionStringBuilder.IntegratedSecurity = true;
             sqlConnectionStringBuilder.AttachDBFilename = pathToModel;

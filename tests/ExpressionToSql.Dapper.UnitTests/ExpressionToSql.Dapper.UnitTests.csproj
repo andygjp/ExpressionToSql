@@ -9,8 +9,8 @@
   <ItemGroup>
     <PackageReference Include="Dapper.Contrib" Version="1.50.5" />
     <PackageReference Include="FluentAssertions" Version="5.5.3" />
+    <PackageReference Include="MartinCostello.SqlLocalDb" Version="2.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
-    <PackageReference Include="System.Data.SqlLocalDb" Version="1.15.0" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
   </ItemGroup>
